@@ -18,9 +18,11 @@ mongoose.connect('mongodb+srv://raniket:'
 
 // Logger middleware.
 app.use(morgan('dev'));
+
 // Parse request body middleware.
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
 // Enable CORS middleware.
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');

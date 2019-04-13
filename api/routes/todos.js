@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const dotenv = require('dotenv').config();
 const checkAuth = require('../middleware/check-auth');
-
 const TodoControler = require('../controlers/todos');
 
 router.get('/', checkAuth, TodoControler.getAllTodos);

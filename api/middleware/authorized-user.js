@@ -7,6 +7,6 @@ module.exports = (req, res, next) => {
   if (userId === userData) {
     next();
   } else {
-    res.status(401).json({ message: 'Auth faileded' });
+    res.status(401).json({ message: 'Auth failed' });
   }
 };

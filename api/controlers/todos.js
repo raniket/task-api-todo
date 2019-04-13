@@ -7,8 +7,8 @@ exports.getAllTodos = (req, res, next) => {
   // res.status(200).json({
   //   message: 'get all items'
   // });
-
-  Todo.find()
+  const userId =  req.userData.id;
+  Todo.find({ createdBy: userId })
     .select('_id name description done createdBy createdAt')
     .exec()
     .then(docs => {
@@ -34,10 +34,6 @@ exports.getAllTodos = (req, res, next) => {
 };
 
 exports.createTodo = (req, res, next) => {
-  // console.log('create item');
-  // res.status(201).json({
-  //   message: 'create item'
-  // });
 
   const { name, description, done, createdBy } = req.body;
 
@@ -85,14 +81,18 @@ exports.getTodo = (req, res, next) => {
     .then(doc => {
       console.log('from database : ', doc);
       if (doc) {
-        res.status(200).json({
-          ...doc._doc,
-          request: {
-            type: 'GET',
-            description: 'get list of all todos',
-            url: `${process.env.BASE_URL}/todos`
-          }
-        });
+        if (doc._doc.createdBy == req.userData.id) {
+          res.status(200).json({
+            ...doc._doc,
+            request: {
+              type: 'GET',
+              description: 'get list of all todos',
+              url: `${process.env.BASE_URL}/todos`
+            }
+          });
+        } else {
+          res.status(401).json({ message: 'Auth failed' });
+        }
       } else {
         res.status(404).json({
           error: {
@@ -115,10 +115,10 @@ exports.updateTodo = (req, res, next) => {
   //   message: 'update item'
   // });
 
-  const id = req.params.todoId;
+  const todoId = req.params.todoId;
   console.log('item body : ', req.body);
   const updateTodo = req.body;
-  Todo.update({ _id: id }, { $set: updateTodo })
+  Todo.update({ _id: todoId }, { $set: updateTodo })
     .exec()
     .then(result => {
       console.log(result);
@@ -127,7 +127,7 @@ exports.updateTodo = (req, res, next) => {
         request: {
           type: 'GET',
           description: 'get todo by id',
-          url: `${process.env.BASE_URL}/todo/${id}`
+          url: `${process.env.BASE_URL}/todo/${todoId}`
         }
       });
     })
@@ -156,7 +156,7 @@ exports.deleteTodo = (req, res, next) => {
           name: 'String',
           description: 'String',
           done: 'Boolean',
-          createdBy: 'Object Id'
+          createdBy: 'ObjectId'
         }
       }
     }))
